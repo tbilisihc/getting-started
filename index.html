@@ -306,8 +306,10 @@
                 }
             }
 
-            // Initialize the application
-            loadArticles();
+            // Wait for the entire page to load before running the script
+            window.addEventListener("load", () => {
+                loadArticles();
+            });
         </script>
     </body>
 </html>
