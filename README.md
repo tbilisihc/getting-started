@@ -49,7 +49,7 @@ This project is designed to be incredibly easy to set up. All you need to do is 
 Adding a new article is as simple as adding a file to your GitHub repository.
 
 1.  Create a new Jupyter Notebook (`.ipynb` file).
-2.  Give it a descriptive name. You can use numbers at the beginning (e.g., `01-first-steps.ipynb`) to control the order in which they appear on the site.
+2.  Give it a descriptive name. You can use numbers at the beginning (e.g., `02 Getting Started.ipynb`) to control the order in which they appear on the site.
 3.  Add the file to the folder specified in the `GITHUB_PATH` variable in your repository.
 4.  Commit and push your changes.
 
@@ -62,6 +62,7 @@ The website will automatically pick up the new file and add it to the article li
 * **JavaScript (ESM)** - For all client-side logic.
 * **Marked.js** - For parsing Markdown content.
 * **Highlight.js** - For code syntax highlighting.
+* **Octocat** - For GitHub logic
 
 No build step or server is required. Just a web server to serve the static `index.html` file. It can be hosted easily on services like GitHub Pages.
 
