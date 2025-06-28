@@ -9,14 +9,20 @@
         <script src="https://cdn.tailwindcss.com"></script>
 
         <!-- Marked.js to parse Markdown from notebooks -->
-        <script src="https://cdn.jsdelivr.com/npm/marked/marked.min.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+            defer
+        ></script>
 
         <!-- highlight.js for syntax highlighting of code blocks (light theme) -->
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
         />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+            defer
+        ></script>
 
         <!-- Google Fonts: Inter -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -219,7 +225,7 @@
                             const markdownEl = document.createElement("div");
                             markdownEl.className =
                                 "prose-custom max-w-none mb-6";
-                            markdownEl.innerHTML = marked.parse(content);
+                            markdownEl.innerHTML = window.marked.parse(content);
                             notebookContentEl.appendChild(markdownEl);
                         } else if (cell.cell_type === "code") {
                             const codeContainer = document.createElement("div");
@@ -240,7 +246,7 @@
                     });
 
                     // Apply syntax highlighting to all newly added code blocks
-                    hljs.highlightAll();
+                    window.hljs.highlightAll();
                 } catch (error) {
                     console.error(
                         "Error fetching or rendering notebook:",
@@ -306,10 +312,9 @@
                 }
             }
 
-            // Wait for the entire page to load before running the script
-            window.addEventListener("load", () => {
-                loadArticles();
-            });
+            // The script is at the end of the body, so the DOM is ready.
+            // The `load` event listener is no longer needed.
+            loadArticles();
         </script>
     </body>
 </html>
