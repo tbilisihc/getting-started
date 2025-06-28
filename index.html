@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tbilisi Hack Club - Getting Started</title>
+
+        <!-- Tailwind CSS for styling -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Marked.js to parse Markdown from notebooks -->
+        <script src="https://cdn.jsdelivr.com/npm/marked/marked.min.js"></script>
+
+        <!-- highlight.js for syntax highlighting of code blocks (light theme) -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+        <!-- Google Fonts: Inter -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            /* Custom styling for the page */
+            body {
+                font-family: "Inter", sans-serif;
+            }
+            /* Custom scrollbar for a better look */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #e5e7eb; /* gray-200 */
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #9ca3af; /* gray-400 */
+                border-radius: 10px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #6b7280; /* gray-500 */
+            }
+            /* Style for rendered markdown content */
+            .prose-custom {
+                color: #374151; /* gray-700 */
+            }
+            .prose-custom h1,
+            .prose-custom h2,
+            .prose-custom h3,
+            .prose-custom h4,
+            .prose-custom strong {
+                color: #111827; /* gray-900 */
+            }
+            .prose-custom a {
+                color: #3b82f6; /* blue-500 */
+            }
+            .prose-custom a:hover {
+                color: #2563eb; /* blue-600 */
+            }
+            .prose-custom code {
+                background-color: #e5e7eb; /* gray-200 */
+                color: #1f2937; /* gray-800 */
+                padding: 0.2em 0.4em;
+                margin: 0;
+                font-size: 85%;
+                border-radius: 6px;
+            }
+            /* Override highlight.js default pre background */
+            pre {
+                border-radius: 0.5rem; /* rounded-lg */
+            }
+        </style>
+    </head>
+    <body class="bg-gray-100 text-gray-800 antialiased">
+        <div class="flex flex-col md:flex-row min-h-screen">
+            <!-- Sidebar for Article Navigation -->
+            <aside
+                class="w-full md:w-72 bg-white/80 backdrop-blur-sm border-r border-gray-200/50 p-6 flex-shrink-0"
+            >
+                <header class="mb-8">
+                    <h1 class="text-2xl font-bold text-black">
+                        Tbilisi Hack Club
+                    </h1>
+                    <p class="text-sm text-gray-600">Getting Started Guides</p>
+                </header>
+                <nav>
+                    <h2
+                        class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3"
+                    >
+                        Articles
+                    </h2>
+                    <div id="article-list" class="space-y-2">
+                        <!-- Loading state for the article list -->
+                        <div class="text-gray-500 animate-pulse">
+                            Loading articles...
+                        </div>
+                    </div>
+                </nav>
+                <footer class="absolute bottom-4 left-4 text-xs text-gray-400">
+                    <p>Built with ❤️ for Tbilisi.</p>
+                </footer>
+            </aside>
+
+            <!-- Main Content Area for Notebook Display -->
+            <main
+                id="notebook-content"
+                class="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto"
+                style="height: 100vh"
+            >
+                <!-- Initial state message -->
+                <div
+                    class="flex flex-col items-center justify-center h-full text-center text-gray-400"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-16 h-16 mb-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 6.253v11.494m-9-5.747h18"
+                        />
+                    </svg>
+                    <h2 class="text-xl font-medium text-gray-500">Welcome!</h2>
+                    <p>Select an article from the list on the left to begin.</p>
+                </div>
+            </main>
+        </div>
+
+        <script type="module">
+            // --- Configuration ---
+            const GITHUB_OWNER = "tbilisihc"; // The GitHub username or organization
+            const GITHUB_REPO = "getting-started"; // The repository name
+            const GITHUB_PATH = "notebooks"; // The folder within the repo where .ipynb files are
+            // -------------------
+
+            const articleListEl = document.getElementById("article-list");
+            const notebookContentEl =
+                document.getElementById("notebook-content");
+            let activeArticleEl = null;
+
+            /**
+             * Renders a message or loading state in the main content area.
+             * @param {string} html - The HTML content to display.
+             */
+            function showStatus(html) {
+                notebookContentEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center text-gray-400">
+                    ${html}
+                </div>
+            `;
+            }
+
+            /**
+             * Cleans up a filename to be a more readable title.
+             * @param {string} filename - The original filename (e.g., "01-first-steps.ipynb").
+             * @returns {string} A cleaned-up title (e.g., "First Steps").
+             */
+            function formatTitle(filename) {
+                return filename
+                    .replace(".ipynb", "") // Remove extension
+                    .replace(/^[0-9]+-?/, "") // Remove leading numbers and dash
+                    .replace(/-/g, " ") // Replace hyphens with spaces
+                    .replace(/\b\w/g, (l) => l.toUpperCase()); // Capitalize words
+            }
+
+            /**
+             * Fetches and renders a Jupyter Notebook from a given URL.
+             * @param {string} downloadUrl - The URL to the raw .ipynb file content.
+             * @param {HTMLElement} articleLinkEl - The sidebar link element that was clicked.
+             */
+            async function fetchAndRenderNotebook(downloadUrl, articleLinkEl) {
+                // Set loading state
+                showStatus(`
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500"></div>
+                <p class="mt-4 text-lg">Loading Notebook...</p>
+            `);
+
+                // Highlight the new active article
+                if (activeArticleEl) {
+                    activeArticleEl.classList.remove(
+                        "bg-blue-100",
+                        "text-blue-600",
+                        "font-semibold",
+                    );
+                }
+                activeArticleEl = articleLinkEl;
+                activeArticleEl.classList.add(
+                    "bg-blue-100",
+                    "text-blue-600",
+                    "font-semibold",
+                );
+
+                try {
+                    const response = await fetch(downloadUrl);
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`,
+                        );
+                    }
+                    const notebook = await response.json();
+
+                    // Clear content area before rendering
+                    notebookContentEl.innerHTML = "";
+
+                    // Process and render each cell of the notebook
+                    notebook.cells.forEach((cell) => {
+                        const content = cell.source.join("");
+                        if (cell.cell_type === "markdown") {
+                            const markdownEl = document.createElement("div");
+                            markdownEl.className =
+                                "prose-custom max-w-none mb-6";
+                            markdownEl.innerHTML = marked.parse(content);
+                            notebookContentEl.appendChild(markdownEl);
+                        } else if (cell.cell_type === "code") {
+                            const codeContainer = document.createElement("div");
+                            codeContainer.className =
+                                "code-block bg-gray-50 border border-gray-200 rounded-lg mb-6 shadow-sm";
+
+                            const preEl = document.createElement("pre");
+                            const codeEl = document.createElement("code");
+
+                            // Assuming Python, but you can get this from notebook metadata if available
+                            codeEl.className = "language-python rounded-lg";
+                            codeEl.textContent = content;
+
+                            preEl.appendChild(codeEl);
+                            codeContainer.appendChild(preEl);
+                            notebookContentEl.appendChild(codeContainer);
+                        }
+                    });
+
+                    // Apply syntax highlighting to all newly added code blocks
+                    hljs.highlightAll();
+                } catch (error) {
+                    console.error(
+                        "Error fetching or rendering notebook:",
+                        error,
+                    );
+                    showStatus(`
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    <h2 class="text-xl font-medium text-red-500 mt-4">Failed to Load Notebook</h2>
+                    <p>Could not fetch the content. Please try again later.</p>
+                    <p class="text-xs mt-2 text-gray-600">${error.message}</p>
+                `);
+                }
+            }
+
+            /**
+             * Main function to fetch the list of articles from the GitHub repo.
+             */
+            async function loadArticles() {
+                // This is the GitHub API endpoint for getting repository contents.
+                const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
+
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) {
+                        throw new Error(
+                            `GitHub API error! Status: ${response.status}. Make sure the repo details are correct and the repository is public.`,
+                        );
+                    }
+                    const files = await response.json();
+
+                    // Filter for .ipynb files and sort them by name
+                    const ipynbFiles = files
+                        .filter((file) => file.name.endsWith(".ipynb"))
+                        .sort((a, b) => a.name.localeCompare(b.name));
+
+                    if (ipynbFiles.length === 0) {
+                        articleListEl.innerHTML = `<p class="text-sm text-gray-500">No .ipynb files found in the specified folder.</p>`;
+                        return;
+                    }
+
+                    // Clear loading state
+                    articleListEl.innerHTML = "";
+
+                    // Create a navigation link for each notebook
+                    ipynbFiles.forEach((file) => {
+                        const articleLink = document.createElement("a");
+                        articleLink.href = "#";
+                        articleLink.className =
+                            "block p-2 rounded-md text-gray-700 hover:bg-gray-200 transition-colors duration-200";
+                        articleLink.textContent = formatTitle(file.name);
+                        articleLink.addEventListener("click", (e) => {
+                            e.preventDefault();
+                            fetchAndRenderNotebook(
+                                file.download_url,
+                                articleLink,
+                            );
+                        });
+                        articleListEl.appendChild(articleLink);
+                    });
+                } catch (error) {
+                    console.error("Error fetching article list:", error);
+                    articleListEl.innerHTML = `<p class="text-sm text-red-500">${error.message}</p>`;
+                }
+            }
+
+            // Initialize the application
+            loadArticles();
+        </script>
+    </body>
+</html>
