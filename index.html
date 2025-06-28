@@ -177,7 +177,6 @@
             function formatTitle(filename) {
                 return filename
                     .replace(".ipynb", "") // Remove extension
-                    .replace(/^[0-9]+-?/, "") // Remove leading numbers and dash
                     .replace(/-/g, " ") // Replace hyphens with spaces
                     .replace(/\b\w/g, (l) => l.toUpperCase()); // Capitalize words
             }
